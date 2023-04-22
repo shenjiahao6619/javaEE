@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<title>个人信息 - EMD分析系统</title>
+		<link rel="icon" href="favicon.ico" type="image/ico">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/materialdesignicons.min.css" rel="stylesheet">
+		<!--标签插件-->
+		<link rel="stylesheet" href="js/jquery-tags-input/jquery.tagsinput.min.css">
+		<link href="css/style.min.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<div class="container-fluid p-t-15">
+
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="card">
+						<div class="card-body">
+
+							<form action="#!" method="post" class="row">	
+								<div class="form-group col-md-12">
+									<label for="userName">用户名</label>
+									<input disabled="disabled" type="text" class="form-control" id="userName" name="userName" value="xiaozhai"  placeholder="请输入标题" />
+								</div>
+								<div class="form-group col-md-12">
+									<label for="userDesc">个人描述</label>
+									<textarea class="form-control" id="userDesc" name="userDesc" rows="5" value="" placeholder="描述"></textarea>
+								</div>
+								<div class="form-group col-md-12">
+									<button type="button" class="btn btn-primary ajax-post" target-form="add-form" onclick="modUser()">保 存</button>
+									<button type="button" class="btn btn-default" onclick="back()">返 回</button>
+								</div>
+							</form>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<!--标签插件-->
+		<script src="js/jquery-tags-input/jquery.tagsinput.min.js"></script>
+		<script type="text/javascript" src="js/main.min.js"></script>
+		<script src="js/bootstrap-notify.min.js"></script>
+		<script type="text/javascript" src="js/lightyear.js"></script>
+		<script>
+			//入口函数
+			$(function(){
+				//初始化当前用户的信息，（设置用户名、描述）
+				viewUserInfo();
+			});
+			//初始化用户名、描述
+			function viewUserInfo()
+			{
+				//从session，获取当前用户的信息
+				let logUser=JSON.parse(sessionStorage.getItem('logUser'));
+				//设置用户名
+				$('#userName').val(logUser.userName);
+				//设置描述
+				$('#userDesc').val(logUser.remark);
+			}
+			//根据用户编号，修改其备注
+			function modUser()
+			{
+				//从session，获取当前用户信息
+				let logUser=JSON.parse(sessionStorage.getItem('logUser'));
+				//组建修改后的当前用户信息
+				let param={
+					"userName":$('#userName').val(),
+					"userId":logUser.userId,
+					"remark":$('#userDesc').val()
+				}
+				//输出到控制台
+				console.info(param);
+					$.getJSON('http://101.201.64.226:8080/sellPros/users/edit',param,function(riv){
+				//
+				console.info('users/edit',riv);
+				//
+				if(riv.code!=1){
+					lightyear.notify(riv.msg,'danger',100);
+					return;
+				}
+				sessionStorage.setItem('logUser',JSON.stringify(param));
+				parent.location.href='index.html';
+				})
+			}
+		
+			function back(){
+				//
+				parent.location.href='index.html';
+			}
+		</script>
+	</body>
+</html>

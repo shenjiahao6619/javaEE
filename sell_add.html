@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>新增销售记录 - 系统</title>
+<link rel="icon" href="favicon.ico" type="image/ico">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/materialdesignicons.min.css" rel="stylesheet">
+<!--标签插件-->
+<link rel="stylesheet" href="js/jquery-tags-input/jquery.tagsinput.min.css">
+<link href="css/style.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid p-t-15">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <form action="#!" method="post" class="row">
+			<div class="form-group col-md-12">
+			  <label for="pro">商品</label>
+			  <select class="form-control" id="pro">
+				  <option value="">电子手表</option>
+				  <option value="">烧水壶</option>
+				  <option value="">毛巾</option>
+				  <option value="">肥皂</option>
+				  <option value="">抽纸</option>
+			  </select>
+			</div>
+			<div class="form-group col-md-12">
+				<label for="user">销售员</label>
+				<select class="form-control" id="user">
+					<option value="">王兆成</option>
+					<option value="">申家豪</option>
+				</select>
+			</div>
+			<div class="form-group col-md-12">
+				<label for="cust">客户</label>
+				<select class="form-control" id="cust">
+					<option value="">未注册</option>
+					<option value="">王兆成</option>
+					<option value="">雷梦飞</option>
+					<option value="">未注明</option>
+				</select>
+			</div>
+			<div class="form-group col-md-12">
+				<label for="sellCount">购买数量</label>
+				<input id="sellCount" class="form-control" type="number"/>	
+			</div>
+			
+			<div class="form-group col-md-12">
+				<label for="sellCount">购买信息</label>
+				<input id="sellDesc" class="form-control"  placeholder="购买信息" row="5"/>	
+			</div>
+            <div class="form-group col-md-12">
+              <button type="button" class="btn btn-primary ajax-post" target-form="add-form" onclick="addItem()">确 定</button>
+              <button type="button" class="btn btn-default" onclick="back()">返 回</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<!--标签插件-->
+<script src="js/jquery-tags-input/jquery.tagsinput.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+<!-- 消息提示 -->
+<script src="js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="js/lightyear.js"></script>
+<script>
+	$(function(){
+		//加载所有的商品
+		loadPros();
+		//加载所有的销售员
+		loadUsers();
+		//加载所有客户
+		loadCust();
+	});
+	//加载所有的商品
+	function loadPros(){
+		$.getJSON("http://101.201.64.226:8080/sellPros/queryProsAll",function (riv){
+				  //输出服务器端返回数据
+		 console.log(riv);
+		 //判断查询失败的情况下给出错误提示
+		 if(riv.code != 1){
+				   //错误提示
+		  lightyear.notify(riv.msg, 'danger', 100);
+		  return;
+		 }
+		 //清空商品下拉框
+		 $('#pro').empty();
+		 //遍历所返回前10条商品类型
+		 for(let item of riv.content){
+			 //当前商品变成option
+			 let row = `<option value ="${item.proId}">${item.proName}</option>`;
+			 //当前row作为资源数，添加给我商品下拉框
+			 $('#pro').append(row);
+		 }
+		})
+	}
+	//加载所有的销售员
+	function loadUsers(){
+		$.getJSON("http://101.201.64.226:8080/sellPros/users/queryAll",function (riv){
+				  //输出服务器端返回数据
+		 console.log(riv);
+		 //判断查询失败的情况下给出错误提示
+		 if(riv.code != 1){
+				   //错误提示
+		  lightyear.notify(riv.msg, 'danger', 100);
+		  return;
+		 }
+		 //清空商品下拉框
+		 $('#user').empty();
+		 //遍历所返回前10条商品销售员
+		 for(let item of riv.content){
+			 //当前商品销售员变成option
+			 let row = `<option value ="${item.userId}">${item.userName}</option>`;
+			 //当前row作为资源数，添加给我商品下拉框
+			 $('#user').append(row);
+		 }
+		})
+	}
+	//加载所有的客户
+	function loadCust(){
+		$.getJSON("http://101.201.64.226:8080/sellPros/customers/queryAll",function (riv){
+				  //输出服务器端返回数据
+		 console.log(riv);
+		 //判断查询失败的情况下给出错误提示
+		 if(riv.code != 1){
+				   //错误提示
+		  lightyear.notify(riv.msg, 'danger', 100);
+		  return;
+		 }
+		 //清空客户下拉框
+		 $('#cust').empty();
+		 //遍历所返回所有的客户
+		 for(let item of riv.content){
+			 //当前商品客户变成option
+			 let row = `<option value ="${item.cusId}">${item.cusName}</option>`;
+			 //当前row作为资源数，添加给我客户下拉框
+			 $('#cust').append(row);
+		 }
+		})
+	}
+	//验证商品名称，单价，客户，描述，购买数量，销售员，都不能为空
+	function addItem(){
+		//判断商品，单价，类别，描述不能为空
+		if(!checkNull()){
+			 return;
+		 }
+		 //组建新添加类别对象
+		 let param={
+			 "prod.proId":$('#pro').val(),
+			 "user.userId":$('#user').val(),
+			 "cust,custId":$('#cust').val(),
+			 "sellCount":$('#sellCount').val(),
+			 "sellDesc":$("#sellDesc").val()
+		 }
+		/* //输出控制台
+		 console.info(param); */
+		 //发送添加销售请求给后端
+		 $.getJSON('http://101.201.64.226:8080/sellPros/sellInfos/add', param, function(riv){
+		 	//输出服务器返回数据
+		    console.info(riv);
+		 	//判断是不是登录失败
+		    if(riv.code != 1){
+				 //弹出错误消息
+		        lightyear.notify('商品销售添加失败', 'danger', 100);
+		        return;
+		     }
+			 //跳转到首页
+			parent.location.href='index.html';
+		});	
+	}
+	//判断购买数量
+	function checkNull(){
+			 //判断数量不能为空
+			 if(!$('#sellCount').val()){
+				 lightyear.notify('请输入商品数量!','danger',100)
+				 return false;
+			 }
+			 //判断描述不能为空
+			 if(!$('#sellDesc').val()){
+			 	 lightyear.notify('请输入购买信息!','danger',100)
+				 return false;
+			 }
+			
+			 //验证通过
+			 return true;
+	}
+	function back()
+	{
+		//跳转到首页
+		parent.location.href='index.html';
+	}
+</script>
+</body>
+</html>

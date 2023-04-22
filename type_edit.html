@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>新增类别 - 系统</title>
+<link rel="icon" href="favicon.ico" type="image/ico">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/materialdesignicons.min.css" rel="stylesheet">
+<!--标签插件-->
+<link rel="stylesheet" href="js/jquery-tags-input/jquery.tagsinput.min.css">
+<link href="css/style.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container-fluid p-t-15">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <form action="#!" method="post" class="row">
+            <div class="form-group col-md-12">
+              <label for="typeName">类别名称</label>
+              <input type="text" class="form-control" id="typeName" name="typeName" value="" placeholder="请输入商品类别:"/>
+            </div>
+            <div class="form-group col-md-12">
+              <label for="typeDesc">类别描述</label>
+              <textarea class="form-control" id="typeDesc" name="typeDesc" rows="5" value="" placeholder="描述"></textarea>
+            </div>
+            <div class="form-group col-md-12">
+              <button type="button" class="btn btn-primary ajax-post" target-form="add-form" onclick="modType()">确 定</button>
+              <button type="button" class="btn btn-default" onclick="back()">返 回</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<!--标签插件-->
+<script src="js/jquery-tags-input/jquery.tagsinput.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
+<!-- 消息提示 -->
+<script src="js/bootstrap-notify.min.js"></script>
+<script type="text/javascript" src="js/lightyear.js"></script>
+ <script>
+	 $(function(){
+		 showEditInfo();
+	 });
+	 
+	 function showEditInfo(){
+		 let modType=JSON.parse(sessionStorage.getItem('modType'));
+		 $('#typeId').val(modType.typeId);
+		 $('#typeName').val(modType.typeName);
+		 $('#typeDesc').val(modType.typeDesc);
+	 }
+	 
+	 //发送异步请求
+	 function modType()
+	 {
+		 //验证编号以及类型名称，类型描述都不为空
+		 if(!checkNull())
+		 {
+			 return;
+		 }
+		 Let param = {
+			 "typeId" :$('#typeId').val(),
+			 "typeName" :('#typeName').val(),
+			 "typeDesc" :('#typeDesc').val()
+			 
+		 }
+		 console.info(param);
+	 }
+	 $.getJSON('http://101.201.64.226:8080/sellPros/users/sell?ros/',param,function(riv){
+		 //输出riv
+		 console.info();
+		 //判断是不是失败了
+		 if(riv.code!=1){
+			 //弹出消息框
+			 lightyear.notify(riv.msg,"danger",100);
+			 return;
+		 }
+		 parent.location.href = 'index.html';
+	 });
+	 //ture验证通过
+	 function checkNull()
+	 {
+		 //有一项为空，给出信息，返回false;
+		 if(!$('#typeName').val()||!$('#typeDesc').val()){
+			 lightyear.notify('类型名称和类型描述都不能为空!','danger',100);
+			 return false;
+			 
+		 }
+		 return ture;
+	 }
+	 
+	 function back(){
+		 parent.location.href='index.html';
+	 }
+ </script>
+</body>
+</html>
